@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from .greetissuetype import GreetIssueType
 
 class AbstractGreetEntity(ABC):
 	"""
     	An abstract base class representing a greet entity.
     """
     
-	def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, string: str):
+	def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, string: str, issue: GreetIssueType = GreetIssueType.CLEAR):
 		"""
         Constructor for the abstract greet entity.
 
@@ -22,6 +23,7 @@ class AbstractGreetEntity(ABC):
 		self.__startColumn = startColumn
 		self.__endColumn = endColumn
 		self.__string = string
+		self.__issue = issue
 
 	def getIdentifier(self) -> str:
 		return self.__identifier
@@ -38,6 +40,13 @@ class AbstractGreetEntity(ABC):
 	def getEndColumn(self) -> int:
 		return self.__endColumn
 	
+	def getIssue(self) -> GreetIssueType:
+		return self.__issue
+
+	# Function to set the issue type
+	def setIssue(self, issue: GreetIssueType):
+		self.__issue = issue
+
 	@abstractmethod
 	def getString() -> str: 
 		pass
