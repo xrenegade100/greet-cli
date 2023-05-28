@@ -1,6 +1,6 @@
 import os
 import ast
-from __model.entity import GreetEntity, GreetEntityType
+from model import greetattribute, greetfunction
 from typing import List
 
 
@@ -17,27 +17,40 @@ class Parser():
                 self.code = code
                 self.opened_file = analyze
 
+    def get_functions(self) -> List[greetfunction.GreetFunction]:
+        if len(self.functions) > 0:
+            return self.functions
+        else:
+            return None
+        
+    def get_attributes(self) -> List[greetattribute.GreetAttribute]:
+        if len(self.attributes) > 0:
+            return self.attributes
+        else:
+            return None
+
     def extract_attribute(self):
         self.__extract(self.code)
-        print(self.attributes)
 
-    def __extract(self, code) -> List[GreetEntity]:
+    def __extract(self, code):
         childs = code.body 
         for index, node in enumerate(childs):
             name = ""
             if isinstance(node, ast.Assign) or (isinstance(node, ast.Expr) and isinstance(node.value, ast.Attribute)):
                 if index - 1 >= 0 and isinstance(code.body[index - 1], ast.Expr):
                     name, colls = self.__extract_name(node)
-                    first_line = self.__get_comment_first_line(code.body[index - 1].lineno)
-                    self.attributes.append({
-                        'name': name,
-                        # is the last line used by the comment, so with comment with mode lines we have to figure out a way to get all of them
-                        'start_line': first_line,
-                        'end_line': node.lineno,
-                        'start_column': self.__get_comment_first_col(first_line),
-                        'end_column': node.col_offset + len(name) + colls,
-                        'comment': ast.literal_eval(code.body[index - 1].value)
-                    })
+                    start_line = self.__get_comment_first_line(code.body[index - 1].lineno)
+                    attribute = greetattribute.GreetAttribute(
+                        identifier= name,
+                        startLine= start_line,
+                        endLine= node.lineno,
+                        startColumn= self.__get_comment_first_col(start_line),
+                        endColumn= node.col_offset + len(name) + colls,
+                        string= "",
+                        value= "",
+                        comment= ast.literal_eval(code.body[index - 1].value)
+                    )
+                    self.attributes.append(attribute)
             elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
                 self.__extract(node)
 
@@ -60,25 +73,25 @@ class Parser():
 
         
 
-    def extract_function(self) -> List[GreetEntity]:
+    def extract_function(self):
         for index, node in enumerate(ast.walk(self.code)):
             if isinstance(node, ast.FunctionDef):
                 args = []
                 for arg in node.args.args:
                     args.append(arg.arg)
                 if isinstance(node.body[0], ast.Expr):
-                    self.functions.append({
-                        'position': index,
-                        'name': node.name,
-                        'args': args,
-                        'comment': ast.literal_eval(node.body[0].value),
-                        'start_line': node.lineno,
-                        'end_line': node.body[0].lineno,
-                        'start_column': node.col_offset + 4,
-                        'end_column': self.__get_comment_last_col(node.body[0].lineno - 1),
-                        'function': self.__get_func_code(node)
-                    })
-        print(self.functions)
+                    function = greetfunction.GreetFunction(
+                        identifier= node.name,
+                        startLine= node.lineno,
+                        endLine= node.body[0].lineno,
+                        startColumn= node.col_offset + 4,
+                        endColumn= self.__get_comment_last_col(node.body[0].lineno - 1),
+                        string= self.__get_func_code(node),
+                        args= args,
+                        comment= ast.literal_eval(node.body[0].value),
+                        entities= []
+                    )
+                    self.functions.append(function)
 
     def __get_func_code(self, function):
         start = function.lineno-1
