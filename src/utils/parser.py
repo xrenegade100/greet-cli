@@ -2,11 +2,25 @@ import os
 import ast
 from model import greetattribute, greetfunction
 from typing import List
+from enum import Enum
 
+class Structures(Enum):
+    LIST = 0
+    TUPLE = 1
+    SET = 2
+    DICTIONARY = 3
 
 class Parser():
     
     def __init__(self, file_path):
+        self.DATA_STRUCTURES_COLSURES = {
+            "list_start": "[",
+            "list_end": "]",
+            "graph_start": "{",
+            "graph_end": "}",
+            "tuple_start": "(",
+            "tuple_end": ")"
+        }
         if os.path.isfile(file_path):
             self.functions = []
             self.attributes = []
@@ -47,12 +61,192 @@ class Parser():
                         startColumn= self.__get_comment_first_col(start_line),
                         endColumn= node.col_offset + len(name) + colls,
                         string= "",
-                        value= "",
+                        value= self.__extract_assign_value(node),
                         comment= ast.literal_eval(code.body[index - 1].value)
                     )
                     self.attributes.append(attribute)
             elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
                 self.__extract(node)
+
+    def __extract_assign_value(self, node):
+        value = ""
+        if isinstance(node, ast.Assign):
+            if isinstance(node.value, ast.Str):
+                expr = ast.Expr(node.value)
+                ast.fix_missing_locations(expr)
+                value = '"' + str(ast.literal_eval(expr.value)) +'"'
+            elif isinstance(node.value, ast.Num):
+                expr = ast.Expr(node.value)
+                ast.fix_missing_locations(expr)
+                value = ast.literal_eval(expr.value)
+            elif isinstance(node.value, ast.Name):
+                value = node.value.id
+            elif isinstance(node.value, ast.Call):
+                value = self.__extract_call(node.value)
+            elif isinstance(node.value, ast.List):
+                value = self.__extract_data_structures(node.value.elts, Structures.LIST)
+            elif isinstance(node.value, ast.Set):
+                value = self.__extract_data_structures(node.value.elts, Structures.SET)
+            elif isinstance(node.value, ast.Tuple):
+                value = self.__extract_data_structures(node.value.elts, Structures.TUPLE)
+            elif isinstance(node.value, ast.Dict):
+                value = self.__extract_dictionary(node.value)
+        
+            return value
+        else:
+            return None
+
+    def __extract_call(self, node):
+        func_name = node.func.id
+        args = ""
+        args_with_key = ""
+
+
+        for i, arg in enumerate(node.args):
+            if isinstance(arg, ast.Str):
+                expr = ast.Expr(arg)
+                ast.fix_missing_locations(expr)
+                args += '"' + str(ast.literal_eval(expr.value)) +'"'
+            elif isinstance(arg, ast.Num):
+                expr = ast.Expr(arg)
+                ast.fix_missing_locations(expr)
+                args += str(ast.literal_eval(expr.value))
+            if isinstance(arg, ast.Name):
+                args += arg.id
+            elif isinstance(arg, ast.Call):
+                args += self.__extract_call(arg)
+            elif isinstance(arg, ast.List):
+                args += self.__extract_data_structures(arg.elts, Structures.LIST)
+            elif isinstance(arg, ast.Set):
+                args += self.__extract_data_structures(arg.elts, Structures.SET)
+            elif isinstance(arg, ast.Tuple):
+                args += self.__extract_data_structures(arg.elts, Structures.TUPLE)
+            elif isinstance(arg, ast.Dict):
+                value = self.__extract_dictionary(arg)
+
+            if i != len(node.args) - 1:
+                args += ", "
+
+
+        for i, keyword in enumerate(node.keywords):
+            value = ""
+
+            if isinstance(keyword.value, ast.Str):
+                expr = ast.Expr(keyword.value)
+                ast.fix_missing_locations(expr)
+                value += '"' + str(ast.literal_eval(expr.value)) +'"'
+            elif isinstance(keyword.value, ast.Num):
+                expr = ast.Expr(keyword.value)
+                ast.fix_missing_locations(expr)
+                value += str(ast.literal_eval(expr.value))
+            if isinstance(keyword.value, ast.Name):
+                value += keyword.value.id
+            elif isinstance(keyword.value, ast.Call):
+                value += self.__extract_call(keyword.value)
+            elif isinstance(keyword.value, ast.List):
+                value += self.__extract_data_structures(keyword.value.elts, Structures.LIST)
+            elif isinstance(keyword.value, ast.Set):
+                value += self.__extract_data_structures(keyword.value.elts, Structures.SET)
+            elif isinstance(keyword.value, ast.Tuple):
+                value += self.__extract_data_structures(keyword.value.elts, Structures.TUPLE)
+            elif isinstance(keyword.value, ast.Dict):
+                value = self.__extract_dictionary(keyword.value)
+
+            args_with_key += keyword.arg + "=" + value
+            
+            if i != len(node.keywords) - 1:
+                args_with_key += ", "
+        
+        call = func_name + "("
+        if args != "":
+            call += args
+
+        if args_with_key != "":
+            call += ", " + args_with_key
+        
+        call += ")"
+
+        return call
+    
+    def __extract_data_structures(self, structure, type):
+
+        res = ""
+        if type == Structures.LIST:
+            res += self.DATA_STRUCTURES_COLSURES["list_start"]
+        elif type == Structures.SET:
+            res += self.DATA_STRUCTURES_COLSURES["graph_start"]
+        elif type == Structures.TUPLE:
+            res += self.DATA_STRUCTURES_COLSURES["tuple_start"]
+        
+        for i, item in  enumerate(structure):
+            if isinstance(item, ast.Str):
+                expr = ast.Expr(item)
+                ast.fix_missing_locations(expr)
+                res += '"' + str(ast.literal_eval(expr.value)) +'"'
+            elif isinstance(item, ast.Num):
+                expr = ast.Expr(item)
+                ast.fix_missing_locations(expr)
+                res += str(ast.literal_eval(expr.value))
+            elif isinstance(item, ast.Name):
+                res += item.id
+            elif isinstance(item, ast.Call):
+                res += self.__extract_call(item)
+            elif isinstance(item, ast.List):
+                res += self.__extract_data_structures(item.elts, Structures.LIST)
+            elif isinstance(item, ast.Set):
+                res += self.__extract_data_structures(item.elts, Structures.SET)
+            elif isinstance(item, ast.Tuple):
+                res += self.__extract_data_structures(item.elts, Structures.TUPLE)
+            elif isinstance(item, ast.Dict):
+                value = self.__extract_dictionary(item)
+
+            if i != len(structure) - 1:
+                res += ", "
+
+        if type == Structures.LIST:
+            res += self.DATA_STRUCTURES_COLSURES["list_end"]
+        elif type == Structures.SET:
+            res += self.DATA_STRUCTURES_COLSURES["graph_end"]
+        elif type == Structures.TUPLE:
+            res += self.DATA_STRUCTURES_COLSURES["tuple_end"]
+
+        return res
+            
+
+
+    def __extract_dictionary(self, dict):
+        dictionary = self.DATA_STRUCTURES_COLSURES["graph_start"]
+        for i, item in enumerate(dict.values):
+            value = ""
+            if isinstance(item, ast.Str):
+                expr = ast.Expr(item)
+                ast.fix_missing_locations(expr)
+                value = '"' + str(ast.literal_eval(expr.value)) +'"'
+            elif isinstance(item, ast.Num):
+                expr = ast.Expr(item)
+                ast.fix_missing_locations(expr)
+                value = str(ast.literal_eval(expr.value))
+            elif isinstance(item, ast.Name):
+                value = item.id
+            elif isinstance(item, ast.Call):
+                value = self.__extract_call(item)
+            elif isinstance(item, ast.List):
+                value = self.__extract_data_structures(item.elts, Structures.LIST)
+            elif isinstance(item, ast.Set):
+                value = self.__extract_data_structures(item.elts, Structures.SET)
+            elif isinstance(item, ast.Tuple):
+                value = self.__extract_data_structures(item.elts, Structures.TUPLE)
+            elif isinstance(item, ast.Dict):
+                value = self.__extract_dictionary(item)
+            
+            dictionary += ast.literal_eval(dict.keys[i]) + ": " + value
+
+            if i != len(dict.values) - 1:
+                dictionary += ", "
+        
+        dictionary += self.DATA_STRUCTURES_COLSURES["graph_end"]
+
+        return dictionary
 
 
     def __extract_name(self, node):
