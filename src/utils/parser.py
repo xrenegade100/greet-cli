@@ -186,7 +186,7 @@ class Parser():
             elif isinstance(keyword.value, ast.Dict):
                 value = self.__extract_dictionary(keyword.value)
 
-            args_with_key += keyword.arg + "=" + value
+            args_with_key += str(keyword.arg) + "=" + str(value)
             
             if i != len(node.keywords) - 1:
                 args_with_key += ", "
