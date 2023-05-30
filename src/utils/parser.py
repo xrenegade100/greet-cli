@@ -122,7 +122,11 @@ class Parser():
             return None
 
     def __extract_call(self, node):
-        func_name = node.func.id
+        func_name = ""
+        if isinstance(node.func, ast.Attribute):
+            func_name = node.func.attr
+        else:
+            func_name = node.func.id
         args = ""
         args_with_key = ""
 
