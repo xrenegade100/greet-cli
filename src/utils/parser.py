@@ -130,6 +130,8 @@ class Parser():
         func_name = ""
         if isinstance(node.func, ast.Attribute):
             func_name = node.func.attr
+        elif isinstance(node.func, ast.Call):
+            func_name = self.__extract_call(node.func)
         else:
             func_name = node.func.id
         args = ""
