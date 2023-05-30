@@ -22,9 +22,9 @@ class Parser():
             "tuple_end": ")"
         }
         self.code = None
+        self.functions = []
+        self.attributes = []
         if len(parsed_file) > 0:
-            self.functions = []
-            self.attributes = []
             code = ast.parse(parsed_file)
             self.code = code
             self.opened_file = parsed_file
