@@ -78,7 +78,7 @@ class Parser():
             if isinstance(node, ast.Assign) or (isinstance(node, ast.Expr) and isinstance(node.value, ast.Attribute)):
                 if index - 1 >= 0 and isinstance(code.body[index - 1], ast.Expr) and isinstance(code.body[index - 1].value, ast.Str):
                     name, colls = self.__extract_name(node)
-                    start_line = self.__get_comment_first_line(code.body[index - 1].lineno)
+                    start_line = code.body[index - 1].lineno
                     attribute = greetattribute.GreetAttribute(
                         identifier= name,
                         startLine= start_line,
