@@ -31,7 +31,7 @@ class AnalysisController:
 				GreetIssueType.CLEAR: 0,
 				GreetIssueType.ATTRIBUTE_OPPOSITE_COMMENT: 0,
 				GreetIssueType.METHOD_OPPOSITE_COMMENT: 0,
-				GreetIssueType.NOT_IMPL_CONTIDION: 0
+				GreetIssueType.NOT_IMPL_CONDITION: 0
 			}
 
 			functions = p.get_functions() or []
@@ -48,6 +48,7 @@ class AnalysisController:
 					output.append({'file': f, 'identifier': entity.getIdentifier(), 'issue': entity.getIssue()._name_, 'line': entity.getStartLine()})
 				print(f""":`{entity.getIdentifier()}`: {self.getReadableIssueName(GreetIssueType(entity.getIssue()))}: line {entity.getStartLine()}""")
 			self.__save_file_result(f, total_issues)
+		if self.__config.getOutputPath() is not None:
 			self.__fm.saveToOutputPath(output)
 		self.__print_all_results(self.__config.getIncludeClear())
 		return
@@ -67,10 +68,10 @@ class AnalysisController:
 			for file, result in self.__result.items():
 				print(f": file {file}")
 				print("MOP\tAOP\tCLEAR\tNIC")
-				print(f'{result.get(GreetIssueType.METHOD_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.ATTRIBUTE_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.CLEAR, 0)}\t{result.get(GreetIssueType.NOT_IMPL_CONTIDION, 0)}')
+				print(f'{result.get(GreetIssueType.METHOD_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.ATTRIBUTE_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.CLEAR, 0)}\t{result.get(GreetIssueType.NOT_IMPL_CONDITION, 0)}')
 		else:
 			for file, result in self.__result.items():
 				print(f": file {file}")
 				print("MOP\tAOP\tNIC")
-				print(f'{result.get(GreetIssueType.METHOD_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.ATTRIBUTE_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.NOT_IMPL_CONTIDION, 0)}')
+				print(f'{result.get(GreetIssueType.METHOD_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.ATTRIBUTE_OPPOSITE_COMMENT, 0)}\t{result.get(GreetIssueType.NOT_IMPL_CONDITION, 0)}')
 		
