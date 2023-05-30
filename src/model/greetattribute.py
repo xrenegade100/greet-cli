@@ -30,6 +30,8 @@ class GreetAttribute(AbstractGreetEntity):
         Returns:
             str: The string representing the greet attribute.
         """
-        return f"""{self.__comment}
+        return f"""\"\"\"
+{self.__comment.strip()}
+\"\"\"
 {self._AbstractGreetEntity__identifier} = {self.__value}
 """
