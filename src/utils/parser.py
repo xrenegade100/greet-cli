@@ -12,7 +12,7 @@ class Structures(Enum):
 
 class Parser():
     
-    def __init__(self, file_path):
+    def __init__(self, parsed_file):
         self.DATA_STRUCTURES_COLSURES = {
             "list_start": "[",
             "list_end": "]",
@@ -21,15 +21,12 @@ class Parser():
             "tuple_start": "(",
             "tuple_end": ")"
         }
-        if os.path.isfile(file_path):
+        if len(parsed_file) > 0:
             self.functions = []
             self.attributes = []
-            self.file_path = file_path
-            with open(self.file_path, 'r') as source:
-                analyze = source.read()
-                code = ast.parse(analyze)
-                self.code = code
-                self.opened_file = analyze
+            code = ast.parse(parsed_file)
+            self.code = code
+            self.opened_file = parsed_file
 
     def get_functions(self) -> List[greetfunction.GreetFunction]:
         """
@@ -56,7 +53,8 @@ class Parser():
             the function takes care of extracting the variables and their comments
             from the target file of the class by calling the private function __extract()
         """
-        self.__extract(self.code)
+        if self.code:
+            self.__extract(self.code)
 
     def __extract(self, code):
         """
@@ -78,7 +76,7 @@ class Parser():
         for index, node in enumerate(childs):
             name = ""
             if isinstance(node, ast.Assign) or (isinstance(node, ast.Expr) and isinstance(node.value, ast.Attribute)):
-                if index - 1 >= 0 and isinstance(code.body[index - 1], ast.Expr):
+                if index - 1 >= 0 and isinstance(code.body[index - 1], ast.Expr) and isinstance(code.body[index - 1].value, ast.Str):
                     name, colls = self.__extract_name(node)
                     start_line = self.__get_comment_first_line(code.body[index - 1].lineno)
                     attribute = greetattribute.GreetAttribute(
@@ -295,24 +293,25 @@ class Parser():
         
 
     def extract_function(self):
-        for index, node in enumerate(ast.walk(self.code)):
-            if isinstance(node, ast.FunctionDef):
-                args = []
-                for arg in node.args.args:
-                    args.append(arg.arg)
-                if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Str):
-                    function = greetfunction.GreetFunction(
-                        identifier= node.name,
-                        startLine= node.lineno,
-                        endLine= node.body[0].lineno,
-                        startColumn= node.col_offset + 4,
-                        endColumn= self.__get_comment_last_col(node.body[0].lineno - 1),
-                        string= self.__get_func_code(node),
-                        args= args,
-                        comment= ast.literal_eval(node.body[0].value),
-                        entities= []
-                    )
-                    self.functions.append(function)
+        if self.code:
+            for index, node in enumerate(ast.walk(self.code)):
+                if isinstance(node, ast.FunctionDef):
+                    args = []
+                    for arg in node.args.args:
+                        args.append(arg.arg)
+                    if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Str):
+                        function = greetfunction.GreetFunction(
+                            identifier= node.name,
+                            startLine= node.lineno,
+                            endLine= node.body[0].lineno,
+                            startColumn= node.col_offset + 4,
+                            endColumn= self.__get_comment_last_col(node.body[0].lineno - 1),
+                            string= self.__get_func_code(node),
+                            args= args,
+                            comment= ast.literal_eval(node.body[0].value),
+                            entities= []
+                        )
+                        self.functions.append(function)
 
     def __get_func_code(self, function):
         start = function.lineno-1
