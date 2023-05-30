@@ -32,21 +32,48 @@ class Parser():
                 self.opened_file = analyze
 
     def get_functions(self) -> List[greetfunction.GreetFunction]:
+        """
+            returns an array of elements of type GreetFunction containing the information
+            extracted by parsing the file if it contains elements, None otherwise
+        """
         if len(self.functions) > 0:
             return self.functions
         else:
             return None
         
     def get_attributes(self) -> List[greetattribute.GreetAttribute]:
+        """
+            returns an array of elements of type GreetAttribute containing the information
+            extracted by parsing the file if it contains elements, None otherwise
+        """
         if len(self.attributes) > 0:
             return self.attributes
         else:
             return None
 
     def extract_attribute(self):
+        """
+            the function takes care of extracting the variables and their comments
+            from the target file of the class by calling the private function __extract()
+        """
         self.__extract(self.code)
 
     def __extract(self, code):
+        """
+            through the use of the ast class for parsing the syntactic tree,
+            the function takes care of extracting the variables from the target file with the respective comments,
+            i.e. those found above the variable and which are documentation comments, i.e. multiline.
+
+            The analysis is carried out recursively, when the function is inside a node of the tree that can have children, therefore a function or a class,
+            we take the list of children of the node, if we find a node corresponding to a variable we verify that its left brother,
+            i.e. the node immediately before in the file, is a multiline comment, if so we create an instance of GreetAttribute containing
+            the fundamental information for the analysis and insert it in the list, otherwise we go after you.
+            
+            When in the list of children we find a node of type Function or Class we recursively call the function to re-perform the analysis
+
+            Args:
+                code: the parent node of the subtree to be analyzed
+        """
         childs = code.body 
         for index, node in enumerate(childs):
             name = ""
