@@ -21,6 +21,7 @@ class Parser():
             "tuple_start": "(",
             "tuple_end": ")"
         }
+        self.code = None
         if len(parsed_file) > 0:
             self.functions = []
             self.attributes = []
