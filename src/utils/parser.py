@@ -285,6 +285,8 @@ class Parser():
             if isinstance(node.targets[0], ast.Attribute):
                 name = node.targets[0].attr
                 colls = 5
+            elif isinstance(node.targets[0], ast.Tuple):
+                name = self.__extract_data_structures(node.targets[0].elts, Structures.TUPLE)
             else: 
                 name = node.targets[0].id
         elif (isinstance(node, ast.Expr) and isinstance(node.value, ast.Attribute)):
