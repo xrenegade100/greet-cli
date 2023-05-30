@@ -300,7 +300,7 @@ class Parser():
                 args = []
                 for arg in node.args.args:
                     args.append(arg.arg)
-                if isinstance(node.body[0], ast.Expr):
+                if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Str):
                     function = greetfunction.GreetFunction(
                         identifier= node.name,
                         startLine= node.lineno,
