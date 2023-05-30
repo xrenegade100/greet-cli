@@ -1,6 +1,6 @@
 import os
 import ast
-from model import greetattribute, greetfunction
+from src.model import greetattribute, greetfunction
 from typing import List
 from enum import Enum
 
@@ -47,6 +47,10 @@ class Parser():
             return self.attributes
         else:
             return None
+        
+    def parse_file(self):
+        self.extract_attribute()
+        self.extract_function()
 
     def extract_attribute(self):
         """
