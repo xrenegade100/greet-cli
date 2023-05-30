@@ -1,3 +1,5 @@
+import datetime
+import json
 import os
 from src.model.config import Config
 
@@ -71,3 +73,19 @@ class FileManager:
       with open(name, 'r') as file:
           data = file.read()
       return data
+
+    def saveToOutputPath(self, data):
+      """
+        Saves the given data to the output path specified in the configuration.
+
+        Args:
+        data (str): The data to save.
+      """
+      output_path = self.__config.getOutputPath()
+      output_dir = os.path.dirname(output_path)
+      os.makedirs(output_dir, exist_ok=True)
+
+      filename = os.path.join(output_dir, f"analysis_{datetime.datetime.now().strftime('%Y-%m-%d-%HH-%MM')}.greet.json")
+
+      with open(filename, 'w') as file:
+        file.write(json.dumps(data, indent=4))

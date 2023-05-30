@@ -44,7 +44,13 @@ class GreetFunction(AbstractGreetEntity):
 
     argsString = ", ".join(argsList)
 
-    return f"""{self.__comment}
+    return f"""
 def {self._AbstractGreetEntity__identifier}({argsString}):
-    """
+\"\"\"
+{self.__comment.strip()}
+\"\"\"
+"""
+
+  def __str__(self):
+    return self.getString()
 

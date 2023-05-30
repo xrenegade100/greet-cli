@@ -130,6 +130,8 @@ class Parser():
         func_name = ""
         if isinstance(node.func, ast.Attribute):
             func_name = node.func.attr
+        elif isinstance(node.func, ast.Call):
+            func_name = self.__extract_call(node.func)
         else:
             func_name = node.func.id
         args = ""
@@ -186,7 +188,7 @@ class Parser():
             elif isinstance(keyword.value, ast.Dict):
                 value = self.__extract_dictionary(keyword.value)
 
-            args_with_key += keyword.arg + "=" + value
+            args_with_key += str(keyword.arg) + "=" + str(value)
             
             if i != len(node.keywords) - 1:
                 args_with_key += ", "
@@ -360,4 +362,3 @@ class Parser():
     def __get_comment_first_col(self, start_line):
         splitted = self.opened_file.split('\n')
         return splitted[start_line - 1].find('"')
-
