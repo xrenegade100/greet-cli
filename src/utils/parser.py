@@ -275,7 +275,7 @@ class Parser():
             elif isinstance(item, ast.Dict):
                 value = self.__extract_dictionary(item)
             
-            dictionary += ast.literal_eval(dict.keys[i]) + ": " + value
+            dictionary += str(ast.literal_eval(dict.keys[i])) + ": " + str(value)
 
             if i != len(dict.values) - 1:
                 dictionary += ", "
