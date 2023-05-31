@@ -84,13 +84,14 @@ class Parser():
                 if index - 1 >= 0 and isinstance(code.body[index - 1], ast.Expr) and isinstance(code.body[index - 1].value, ast.Str):
                     name, colls = self.__extract_name(node)
                     start_line = code.body[index - 1].lineno
+            
                     attribute = greetattribute.GreetAttribute(
                         identifier= name,
                         startLine= start_line,
                         endLine= node.lineno,
                         startColumn= self.__get_comment_first_col(start_line),
                         endColumn= node.col_offset + len(name) + colls,
-                        string= "",
+                        code= "",
                         value= self.__extract_assign_value(node),
                         comment= ast.literal_eval(code.body[index - 1].value)
                     )
@@ -321,7 +322,7 @@ class Parser():
                             endLine= node.body[0].end_lineno,
                             startColumn= node.col_offset + 4,
                             endColumn= self.__get_comment_last_col(node.body[0].lineno - 1),
-                            string= self.__get_func_code(node),
+                            code= self.__get_func_code(node),
                             args= args,
                             comment= ast.literal_eval(node.body[0].value),
                             entities= []

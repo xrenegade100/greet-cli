@@ -5,7 +5,8 @@ import requests
 import numpy as np
 from transformers import RobertaTokenizer
 from src.model.config import Config
-from src.model.greetentity import AbstractGreetEntity
+from src.model import greetattribute, greetfunction
+from typing import Union
 
 class Classifier:
     """
@@ -84,7 +85,7 @@ class Classifier:
             return_tensors='pt'
         )
     
-    def predict(self, entity: AbstractGreetEntity):
+    def predict(self, entity: Union[greetfunction.GreetFunction, greetattribute.GreetAttribute]):
       """
         Predicts the class label for the given entity.
         
@@ -94,7 +95,7 @@ class Classifier:
         Returns:
           int: The predicted class label.
       """
-      encoding = self.__preprocess_text(entity.getString())
+      encoding = self.__preprocess_text(entity.getCode().strip())
       predict_ids = []
       predict_attention_mask = []
       # Extract IDs and Attention Mask

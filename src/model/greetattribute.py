@@ -5,7 +5,7 @@ class GreetAttribute(AbstractGreetEntity):
     A class representing a greet attribute.
     """
 
-    def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, string: str, value: str, comment: str = ''):
+    def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, code: str, value: str, comment: str = ''):
         """
         Constructor for the GreetAttribute class.
 
@@ -19,11 +19,11 @@ class GreetAttribute(AbstractGreetEntity):
             value (str): The value assigned to the attribute.
             comment (str, optional): Optional comment associated with the attribute. Defaults to ''.
         """
-        super().__init__(identifier, startLine, endLine, startColumn, endColumn, string)
+        super().__init__(identifier, startLine, endLine, startColumn, endColumn, code=code)
         self.__value = value
         self.__comment = comment
 
-    def getString(self) -> str:
+    def getCode(self) -> str:
         """
         Get the string representing the greet attribute.
 

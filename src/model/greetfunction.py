@@ -6,7 +6,7 @@ class GreetFunction(AbstractGreetEntity):
     A class representing a greet function found in a source code file.
   """
 
-  def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, string: str, args: List[str] = [], comment = '', entities: List[AbstractGreetEntity] = []):
+  def __init__(self, identifier: str, startLine: int, endLine: int, startColumn: int, endColumn: int, code: str, args: List[str] = [], comment = '', entities: List[AbstractGreetEntity] = []):
     """
     Constructor for the GreetFunction class.
 
@@ -17,7 +17,7 @@ class GreetFunction(AbstractGreetEntity):
         endColumn (int): The end column of the greet function.
         string (str): The string representing the greet function.
     """
-    super().__init__(identifier, startLine, endLine, startColumn, endColumn, string)
+    super().__init__(identifier, startLine, endLine, startColumn, endColumn, code= code)
     self.__args = args
     self.__comment = comment
     self.__entities = entities
@@ -31,26 +31,6 @@ class GreetFunction(AbstractGreetEntity):
     """
     return self.__entities
 
-  def getString(self) -> str:
-    """
-      Get the string representing the greet function.
-
-      Returns:
-        str: The string representing the greet function.
-    """
-    argsList = []
-    for arg in self.__args:
-      argsList.append(str(arg))
-
-    argsString = ", ".join(argsList)
-
-    return f"""
-def {self._AbstractGreetEntity__identifier}({argsString}):
-\"\"\"
-{self.__comment.strip()}
-\"\"\"
-"""
-
   def __str__(self):
-    return self.getString()
+    return self.__code
 
