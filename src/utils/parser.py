@@ -318,7 +318,7 @@ class Parser():
                         function = greetfunction.GreetFunction(
                             identifier= node.name,
                             startLine= node.lineno,
-                            endLine= node.body[0].lineno,
+                            endLine= node.body[0].end_lineno,
                             startColumn= node.col_offset + 4,
                             endColumn= self.__get_comment_last_col(node.body[0].lineno - 1),
                             string= self.__get_func_code(node),
