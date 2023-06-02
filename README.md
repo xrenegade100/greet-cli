@@ -14,9 +14,7 @@
 <details>
   <summary></summary>
   
-  
-![image](https://github.com/xrenegade100/greet-cli/assets/11615441/c4cd2226-2cda-4300-898b-82dfbf245f1f)
-![image](https://github.com/xrenegade100/greet-cli/assets/11615441/a8d8380e-4d59-4702-a3ed-0f8add41907e)
+![image](https://github.com/xrenegade100/greet-cli/assets/11615441/24d2fb01-8b69-4546-9f5c-822c9a8e0dc8)
 
 </details>
 
